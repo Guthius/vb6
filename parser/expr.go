@@ -13,7 +13,7 @@ func parseExpr(p *parser, bp bindingPower) ast.Expr {
 
 	nfn, ok := tables.nud[kind]
 	if !ok {
-		panic(fmt.Errorf("unexpected token %s", lexer.TokenKindString(kind)))
+		panic(p.unexpected())
 	}
 
 	left := nfn(p)
@@ -22,7 +22,7 @@ func parseExpr(p *parser, bp bindingPower) ast.Expr {
 
 		lfn, ok := tables.led[kind]
 		if !ok {
-			panic(fmt.Errorf("unexpected token %s", lexer.TokenKindString(kind)))
+			panic(p.unexpected())
 		}
 
 		left = lfn(p, left, tables.bp[p.peek()])
@@ -50,7 +50,7 @@ func parsePrimaryExpr(p *parser) ast.Expr {
 		return parseSymbolExpr(p)
 
 	default:
-		panic(fmt.Errorf("unexpected token %s", lexer.TokenKindString(kind)))
+		panic(p.unexpected())
 	}
 }
 

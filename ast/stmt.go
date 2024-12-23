@@ -100,3 +100,7 @@ type SubStmt struct {
 }
 
 func (n SubStmt) Stmt() {}
+
+type OptionExplicitStmt struct{}
+
+func (n OptionExplicitStmt) Stmt() {}

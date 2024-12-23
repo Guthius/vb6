@@ -84,6 +84,7 @@ func init() {
 	stmt(lexer.ExitFunction, parseExitFunctionStmt)
 	stmt(lexer.For, parseForStmt)
 	stmt(lexer.Sub, parseSubStmt)
+	stmt(lexer.OptionExplicit, parseOptionExplicitStmt)
 }
 
 func stmt(king lexer.Kind, handler stmtHandler) {

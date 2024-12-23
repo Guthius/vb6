@@ -50,10 +50,6 @@ func parseDeclStmt(p *parser) ast.Stmt {
 		return parseConstDeclStmt(p, public)
 	}
 
-	/*
-		Public Item(1 To MAX_ITEMS) As ItemRec
-	*/
-
 	identifier := p.expect(lexer.Identifier).Value
 
 	var ranges []ast.RangeExpr
@@ -375,4 +371,10 @@ func parseSubStmt(p *parser) ast.Stmt {
 		Args:       args,
 		Body:       body,
 	}
+}
+
+func parseOptionExplicitStmt(p *parser) ast.Stmt {
+	p.expect(lexer.OptionExplicit)
+	p.expectOrEof(lexer.LineBreak)
+	return ast.ExitFunctionStmt{}
 }

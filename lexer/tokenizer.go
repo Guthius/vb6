@@ -8,6 +8,8 @@ type lexer struct {
 	Tokens []Token
 	Source string
 	Pos    int
+	Line   int
+	Column int
 }
 
 func newLexer(source string) *lexer {
@@ -15,6 +17,8 @@ func newLexer(source string) *lexer {
 		Tokens: make([]Token, 0),
 		Source: source,
 		Pos:    0,
+		Line:   1,
+		Column: 1,
 	}
 }
 
@@ -36,8 +40,10 @@ func (l *lexer) add(kind Kind, value string) {
 	}
 
 	l.Tokens = append(l.Tokens, Token{
-		Kind:  kind,
-		Value: value,
+		Kind:   kind,
+		Value:  value,
+		Line:   l.Line,
+		Column: l.Column,
 	})
 }
 
@@ -149,7 +155,7 @@ func (lex *lexer) tokenize() {
 			}
 			if lex.Source[lex.Pos:lex.Pos+tokenLen] == tokenSpec.String {
 				lex.add(tokenSpec.Kind, tokenSpec.String)
-				lex.Pos += tokenLen
+				lex.advanceN(tokenLen)
 				tokenFound = true
 				break
 			}
@@ -160,7 +166,7 @@ func (lex *lexer) tokenize() {
 		}
 
 		if lex.Pos < len(lex.Source) && isWhitespace(lex.Source[lex.Pos]) {
-			lex.Pos++
+			lex.advance()
 			continue
 		}
 
@@ -181,26 +187,26 @@ func (lex *lexer) tokenize() {
 func (l *lexer) skipComment(skip int) {
 	l.Pos += skip
 	for l.Pos < len(l.Source) && l.Source[l.Pos] != '\n' && l.Source[l.Pos] != '\r' {
-		l.Pos++
+		l.advance()
 	}
 }
 
 func (l *lexer) tokenizeNumber() {
 	start := l.Pos
 	for l.Pos < len(l.Source) && isDigit(l.Source[l.Pos]) {
-		l.Pos++
+		l.advance()
 	}
 	l.add(Number, l.Source[start:l.Pos])
 }
 
 func (l *lexer) tokenizeString() {
-	l.Pos++
+	l.advance()
 	start := l.Pos
 	for l.Pos < len(l.Source) && l.Source[l.Pos] != '"' {
-		l.Pos++
+		l.advance()
 	}
 	l.add(String, l.Source[start:l.Pos])
-	l.Pos++
+	l.advance()
 }
 
 func (l *lexer) tokenizeIdentifier() {
@@ -209,7 +215,23 @@ func (l *lexer) tokenizeIdentifier() {
 		panic(fmt.Sprintf("unexpected character '%c' in identifier near %s", l.Source[l.Pos], l.Source[l.Pos:l.Pos+10]))
 	}
 	for l.Pos < len(l.Source) && isLetterOrDigitOrUnderscore(l.Source[l.Pos]) {
-		l.Pos++
+		l.advance()
 	}
 	l.add(Identifier, l.Source[start:l.Pos])
+}
+
+func (l *lexer) advance() {
+	l.Pos++
+	if l.Source[l.Pos-1] == '\n' {
+		l.Line++
+		l.Column = 1
+	} else {
+		l.Column++
+	}
+}
+
+func (l *lexer) advanceN(n int) {
+	for i := 0; i < n; i++ {
+		l.advance()
+	}
 }

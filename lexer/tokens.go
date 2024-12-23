@@ -269,15 +269,10 @@ func TokenKindString(kind Kind) string {
 }
 
 type Token struct {
-	Value string
-	Kind  Kind
-}
-
-func NewToken(kind Kind, value string) Token {
-	return Token{
-		Kind:  kind,
-		Value: value,
-	}
+	Value  string
+	Kind   Kind
+	Line   int
+	Column int
 }
 
 func (t Token) isOneOf(kinds ...Kind) bool {
