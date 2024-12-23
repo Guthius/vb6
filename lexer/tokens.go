@@ -51,8 +51,10 @@ const (
 	EndEnum
 	Declare
 	Sub
+	EndSub
 	Function
 	EndFunction
+	ExitFunction
 	ByVal
 	ByRef
 	Call
@@ -72,6 +74,7 @@ const (
 	For
 	To
 	Step
+	Next
 	While
 	Wend
 	Do
@@ -182,10 +185,14 @@ func TokenKindString(kind Kind) string {
 		return "Declare"
 	case Sub:
 		return "Sub"
+	case EndSub:
+		return "EndSub"
 	case Function:
 		return "Function"
 	case EndFunction:
 		return "EndFunction"
+	case ExitFunction:
+		return "ExitFunction"
 	case ByVal:
 		return "ByVal"
 	case ByRef:
@@ -220,6 +227,8 @@ func TokenKindString(kind Kind) string {
 		return "To"
 	case Step:
 		return "Step"
+	case Next:
+		return "Next"
 	case While:
 		return "While"
 	case Wend:

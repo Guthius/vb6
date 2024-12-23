@@ -141,3 +141,10 @@ func parseTypeExpr(p *parser) ast.TypeExpr {
 		Len:        nil,
 	}
 }
+
+func parseGroupExpr(p *parser) ast.Expr {
+	p.expect(lexer.LParen)
+	expr := parseExpr(p, defaultBindingPower)
+	p.expect(lexer.RParen)
+	return expr
+}

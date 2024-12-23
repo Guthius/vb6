@@ -69,6 +69,7 @@ func init() {
 	nud(lexer.Number, primary, parsePrimaryExpr)
 	nud(lexer.String, primary, parsePrimaryExpr)
 	nud(lexer.Identifier, primary, parsePrimaryExpr)
+	nud(lexer.LParen, primary, parseGroupExpr)
 
 	// Statements
 	stmt(lexer.Public, parseDeclStmt)
@@ -80,6 +81,9 @@ func init() {
 	stmt(lexer.Function, parseFunctionStmt)
 	stmt(lexer.Dim, parseDimStmt)
 	stmt(lexer.If, parseIfStmt)
+	stmt(lexer.ExitFunction, parseExitFunctionStmt)
+	stmt(lexer.For, parseForStmt)
+	stmt(lexer.Sub, parseSubStmt)
 }
 
 func stmt(king lexer.Kind, handler stmtHandler) {

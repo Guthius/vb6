@@ -11,3 +11,7 @@ Public Const START_Y = MAX_MAPY / 2
 
 Public Const ADMIN_LOG = "admin.txt"
 Public Const PLAYER_LOG = "player.txt"
+
+Public Class() As ClassRec
+Public Item(1 To MAX_ITEMS) As ItemRec
+Public Npc(1 To MAX_NPCS) As NpcRec

@@ -55,6 +55,7 @@ type tokenSpec struct {
 // token before matching it with the '>' token.
 var tokenSpecs = []tokenSpec{
 	{String: "Option Explicit", Kind: OptionExplicit},
+	{String: "Exit Function", Kind: ExitFunction},
 	{String: "End Function", Kind: EndFunction},
 	{String: "End Select", Kind: EndSelect},
 	{String: "DoEvents", Kind: DoEvents},
@@ -64,6 +65,7 @@ var tokenSpecs = []tokenSpec{
 	{String: "Function", Kind: Function},
 	{String: "Boolean", Kind: BooleanType},
 	{String: "Declare", Kind: Declare},
+	{String: "End Sub", Kind: EndSub},
 	{String: "Integer", Kind: IntegerType},
 	{String: "Private", Kind: Private},
 	{String: "Double", Kind: DoubleType},
@@ -88,6 +90,7 @@ var tokenSpecs = []tokenSpec{
 	{String: "GoTo", Kind: GoTo},
 	{String: "Long", Kind: LongType},
 	{String: "Loop", Kind: Loop},
+	{String: "Next", Kind: Next},
 	{String: "Step", Kind: Step},
 	{String: "Then", Kind: Then},
 	{String: "Type", Kind: Type},

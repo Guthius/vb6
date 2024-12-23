@@ -50,7 +50,17 @@ func parseDeclStmt(p *parser) ast.Stmt {
 		return parseConstDeclStmt(p, public)
 	}
 
+	/*
+		Public Item(1 To MAX_ITEMS) As ItemRec
+	*/
+
 	identifier := p.expect(lexer.Identifier).Value
+
+	var ranges []ast.RangeExpr
+	if p.peek() == lexer.LParen {
+		ranges = parseRangeExpr(p)
+	}
+
 	p.expect(lexer.As)
 	dataType := parseTypeExpr(p)
 
@@ -66,6 +76,8 @@ func parseDeclStmt(p *parser) ast.Stmt {
 		Public:     public,
 		Identifier: identifier,
 		Type:       dataType,
+		IsArray:    ranges != nil,
+		Ranges:     ranges,
 		Value:      value,
 	}
 }
@@ -74,7 +86,7 @@ func parseRangeExpr(p *parser) []ast.RangeExpr {
 	ranges := make([]ast.RangeExpr, 0)
 
 	p.expect(lexer.LParen)
-	for {
+	for p.peek() != lexer.RParen {
 		l := parseExpr(p, assignment)
 		p.expect(lexer.To)
 		u := parseExpr(p, assignment)
@@ -164,37 +176,8 @@ func parseDeclareStmt(p *parser) ast.Stmt {
 	lib := p.expect(lexer.String).Value
 	p.expect(lexer.Alias)
 	alias := p.expect(lexer.String).Value
-
 	p.expect(lexer.LParen)
-
-	args := make([]ast.ArgExpr, 0)
-	for p.peek() != lexer.RParen {
-		byRef := false
-		switch p.peek() {
-		case lexer.ByVal:
-			p.next()
-		case lexer.ByRef:
-			byRef = true
-			p.next()
-		}
-
-		name := p.expect(lexer.Identifier).Value
-		p.expect(lexer.As)
-		argType := parseTypeExpr(p)
-
-		args = append(args, ast.ArgExpr{
-			ByRef:      byRef,
-			Identifier: name,
-			Type:       argType,
-		})
-
-		if p.peek() != lexer.Comma {
-			break
-		}
-
-		p.next()
-	}
-
+	args := parseArgList(p)
 	p.expect(lexer.RParen)
 
 	var returnType ast.TypeExpr
@@ -228,8 +211,8 @@ func parseArgList(p *parser) []ast.ArgExpr {
 
 		name := p.expect(lexer.Identifier).Value
 		p.expect(lexer.As)
-		argType := parseTypeExpr(p)
 
+		argType := parseTypeExpr(p)
 		args = append(args, ast.ArgExpr{
 			ByRef:      byRef,
 			Identifier: name,
@@ -338,5 +321,58 @@ func parseIfStmt(p *parser) ast.Stmt {
 		Body:      body,
 		ElseIf:    elseIf,
 		Else:      elseBody,
+	}
+}
+
+func parseExitFunctionStmt(p *parser) ast.Stmt {
+	p.expect(lexer.ExitFunction)
+	p.expectOrEof(lexer.LineBreak)
+	return ast.ExitFunctionStmt{}
+}
+
+func parseForStmt(p *parser) ast.Stmt {
+	p.expect(lexer.For)
+	identifier := p.expect(lexer.Identifier).Value
+	p.expect(lexer.Equal)
+	start := parseExpr(p, assignment)
+	p.expect(lexer.To)
+	end := parseExpr(p, assignment)
+	var step ast.Expr
+	if p.peek() == lexer.Step {
+		p.next()
+		step = parseExpr(p, assignment)
+	}
+	p.expectOrEof(lexer.LineBreak)
+	body := parseBlockStmt(p, lexer.Next)
+	p.expect(lexer.Next)
+	next := p.expect(lexer.Identifier).Value
+	if next != identifier {
+		panic("Next identifier must match For identifier")
+	}
+	p.expectOrEof(lexer.LineBreak)
+
+	return ast.ForStmt{
+		Identifier: identifier,
+		Start:      start,
+		End:        end,
+		Step:       step,
+		Body:       body,
+	}
+}
+
+func parseSubStmt(p *parser) ast.Stmt {
+	p.expect(lexer.Sub)
+	identifier := p.expect(lexer.Identifier).Value
+	p.expect(lexer.LParen)
+	args := parseArgList(p)
+	p.expect(lexer.RParen)
+	p.expectOrEof(lexer.LineBreak)
+	body := parseBlockStmt(p, lexer.EndSub)
+	p.expect(lexer.EndSub)
+
+	return ast.SubStmt{
+		Identifier: identifier,
+		Args:       args,
+		Body:       body,
 	}
 }

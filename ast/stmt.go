@@ -22,6 +22,8 @@ type VarDeclStmt struct {
 	Public     bool
 	Identifier string
 	Type       TypeExpr
+	IsArray    bool
+	Ranges     []RangeExpr
 	Value      Expr
 }
 
@@ -76,3 +78,25 @@ type IfStmt struct {
 }
 
 func (n IfStmt) Stmt() {}
+
+type ExitFunctionStmt struct{}
+
+func (n ExitFunctionStmt) Stmt() {}
+
+type ForStmt struct {
+	Identifier string
+	Start      Expr
+	End        Expr
+	Step       Expr
+	Body       BlockStmt
+}
+
+func (n ForStmt) Stmt() {}
+
+type SubStmt struct {
+	Identifier string
+	Args       []ArgExpr
+	Body       BlockStmt
+}
+
+func (n SubStmt) Stmt() {}
