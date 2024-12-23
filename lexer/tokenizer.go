@@ -2,7 +2,6 @@ package lexer
 
 import (
 	"fmt"
-	"strings"
 )
 
 type lexer struct {
@@ -133,7 +132,7 @@ func (lex *lexer) tokenize() {
 		// Rem indicates a comment, but it can only be used at the beginning of a line.
 		// So it must either be the first token in the source, or it must be preceded by a line break.
 		if len(lex.Source)-lex.Pos >= 3 && lex.Source[lex.Pos:lex.Pos+3] == "Rem" && (len(lex.Tokens) == 0 || lex.Tokens[len(lex.Tokens)-1].Kind == LineBreak) {
-			lex.tokenizeComment(3)
+			lex.skipComment(3)
 			continue
 		}
 
@@ -163,7 +162,7 @@ func (lex *lexer) tokenize() {
 
 		switch c {
 		case '\'':
-			lex.tokenizeComment(1)
+			lex.skipComment(1)
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			lex.tokenizeNumber()
 		case '"':
@@ -175,13 +174,11 @@ func (lex *lexer) tokenize() {
 	lex.add(EOF, "")
 }
 
-func (l *lexer) tokenizeComment(skip int) {
+func (l *lexer) skipComment(skip int) {
 	l.Pos += skip
-	start := l.Pos
 	for l.Pos < len(l.Source) && l.Source[l.Pos] != '\n' && l.Source[l.Pos] != '\r' {
 		l.Pos++
 	}
-	l.add(Comment, strings.TrimSpace(l.Source[start:l.Pos]))
 }
 
 func (l *lexer) tokenizeNumber() {

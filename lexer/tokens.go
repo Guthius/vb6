@@ -92,7 +92,6 @@ const (
 	// Special
 	Dot
 	FileNumber
-	Comment
 
 	// TODO: Event + RaiseEvent keywords
 	// TODO: AddressOf Lib Alias, Array LBound, UBound
@@ -252,8 +251,6 @@ func TokenKindString(kind Kind) string {
 		return "Dot"
 	case FileNumber:
 		return "FileNumber"
-	case Comment:
-		return "Comment"
 	default:
 		return "Unknown"
 	}
@@ -337,7 +334,7 @@ func (t Token) IsDataType() bool {
 }
 
 func (t Token) String() string {
-	if t.isOneOf(Identifier, String, Number, Comment) {
+	if t.isOneOf(Identifier, String, Number) {
 		return fmt.Sprintf("%s (%s)", TokenKindString(t.Kind), t.Value)
 	} else {
 		return TokenKindString(t.Kind)
