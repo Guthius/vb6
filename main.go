@@ -1,18 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/guthius/vb6/lexer"
+	"github.com/guthius/vb6/parser"
+	"github.com/sanity-io/litter"
 )
 
 func main() {
-	bytes, _ := os.ReadFile("examples/modDatabase.bas")
+	bytes, _ := os.ReadFile("examples/math_expr.bas")
 	source := string(bytes)
 
 	tokens := lexer.Tokenize(source)
-	for _, token := range tokens {
-		fmt.Printf("%v\n", token)
-	}
+	ast := parser.Parse(tokens)
+
+	litter.Dump(ast)
 }
