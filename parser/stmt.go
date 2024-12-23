@@ -101,7 +101,8 @@ func parseRangeExpr(p *parser) []ast.RangeExpr {
 func parseFieldDeclExpr(p *parser) ast.FieldDeclExpr {
 	var ranges []ast.RangeExpr
 
-	identifier := p.expect(lexer.Identifier).Value
+	identifier := p.expectIdentifier().Value
+
 	if p.peek() == lexer.LParen {
 		ranges = parseRangeExpr(p)
 	}
@@ -246,11 +247,40 @@ func parseFunctionStmt(p *parser) ast.Stmt {
 	}
 }
 
+func parseDimChain(p *parser, block ast.BlockStmt) ast.Stmt {
+	for p.peek() == lexer.Comma {
+		p.expect(lexer.Comma)
+		identifier := p.expect(lexer.Identifier).Value
+		p.expect(lexer.As)
+		dataType := parseTypeExpr(p)
+
+		block = append(block, ast.VarDeclStmt{
+			Public:     false,
+			Identifier: identifier,
+			Type:       dataType,
+		})
+
+		if p.peek() == lexer.Comma {
+			break
+		}
+	}
+	p.expectOrEof(lexer.LineBreak)
+	return block
+}
+
 func parseDimStmt(p *parser) ast.Stmt {
 	p.expect(lexer.Dim)
 	identifier := p.expect(lexer.Identifier).Value
 	p.expect(lexer.As)
 	dataType := parseTypeExpr(p)
+	if p.peek() == lexer.Comma {
+		return parseDimChain(p, ast.BlockStmt{ast.VarDeclStmt{
+			Public:     false,
+			Identifier: identifier,
+			Type:       dataType,
+		}})
+	}
+
 	p.expectOrEof(lexer.LineBreak)
 
 	return ast.VarDeclStmt{

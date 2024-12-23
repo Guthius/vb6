@@ -43,6 +43,19 @@ func (p *parser) expect(kind lexer.Kind) lexer.Token {
 	panic(expectedToken(p.Tokens[p.Pos], kind))
 }
 
+func (p *parser) expectIdentifier() lexer.Token {
+	kind := p.peek()
+	if kind == lexer.Identifier {
+		return p.next()
+	}
+	for _, k := range allowedIdentifiers {
+		if kind == k {
+			return p.next()
+		}
+	}
+	panic(expectedToken(p.Tokens[p.Pos], lexer.Identifier))
+}
+
 func (p *parser) expectOrEof(kind lexer.Kind) lexer.Token {
 	k := p.peek()
 	if k == kind || k == lexer.EOF {

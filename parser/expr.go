@@ -13,6 +13,11 @@ func parseExpr(p *parser, bp bindingPower) ast.Expr {
 
 	nfn, ok := tables.nud[kind]
 	if !ok {
+		for _, k := range allowedIdentifiers {
+			if kind == k {
+				return parseSymbolExpr(p)
+			}
+		}
 		panic(p.unexpected())
 	}
 
@@ -55,7 +60,7 @@ func parsePrimaryExpr(p *parser) ast.Expr {
 }
 
 func parseSymbolExpr(p *parser) ast.Expr {
-	identifier := p.expect(lexer.Identifier).Value
+	identifier := p.expectIdentifier().Value
 	if p.peek() == lexer.LParen {
 		return parseCallExpr(p, identifier)
 	}
@@ -120,7 +125,7 @@ func parseTypeExpr(p *parser) ast.TypeExpr {
 
 	dataType, ok := dataTypeMap[cur.Kind]
 	if !ok {
-		panic(fmt.Errorf("unexpected token %s", lexer.TokenKindString(cur.Kind)))
+		panic(unexpectedToken(cur))
 	}
 
 	if dataType == ast.DtString {

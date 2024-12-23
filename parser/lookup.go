@@ -21,6 +21,14 @@ const (
 	primary
 )
 
+// allowedIdentifiers is a list of all the tokens that can be used as identifiers.
+var allowedIdentifiers = []lexer.Kind{
+	lexer.Identifier,
+	lexer.Public,
+	lexer.Private,
+	lexer.Type,
+}
+
 type stmtHandler func(*parser) ast.Stmt
 type nudHandler func(*parser) ast.Expr
 type ledHandler func(*parser, ast.Expr, bindingPower) ast.Expr
