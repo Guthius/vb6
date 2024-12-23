@@ -281,17 +281,62 @@ func parseDimStmt(p *parser) ast.Stmt {
 	}
 }
 
-func parseBlockStmt(p *parser, end lexer.Kind) ast.BlockStmt {
+func parseBlockStmt(p *parser, end ...lexer.Kind) ast.BlockStmt {
 	body := make(ast.BlockStmt, 0)
 
 	for !p.isEof() {
 		p.skipLineBreaks()
-		if p.isEof() || p.peek() == end {
+		if p.isEof() {
 			break
+		}
+
+		for _, kind := range end {
+			if p.peek() == kind {
+				return body
+			}
 		}
 
 		body = append(body, p.parseStmt())
 	}
 
 	return body
+}
+
+func parseIfStmt(p *parser) ast.Stmt {
+	p.expect(lexer.If)
+	condition := parseExpr(p, assignment)
+	p.expect(lexer.Then)
+	p.expectOrEof(lexer.LineBreak)
+	body := parseBlockStmt(p, lexer.ElseIf, lexer.Else, lexer.EndIf)
+
+	var elseIf []ast.ElseIfStmt
+	if p.peek() == lexer.ElseIf {
+		elseIf = make([]ast.ElseIfStmt, 0)
+		for p.peek() == lexer.ElseIf {
+			p.next()
+			elseIfCondition := parseExpr(p, assignment)
+			p.expect(lexer.Then)
+			p.expectOrEof(lexer.LineBreak)
+			elseBody := parseBlockStmt(p, lexer.ElseIf, lexer.Else, lexer.EndIf)
+			elseIf = append(elseIf, ast.ElseIfStmt{
+				Condition: elseIfCondition,
+				Body:      elseBody,
+			})
+		}
+	}
+
+	var elseBody ast.BlockStmt
+	if p.peek() == lexer.Else {
+		p.next()
+		elseBody = parseBlockStmt(p, lexer.ElseIf, lexer.Else, lexer.EndIf)
+	}
+
+	p.expect(lexer.EndIf)
+
+	return ast.IfStmt{
+		Condition: condition,
+		Body:      body,
+		ElseIf:    elseIf,
+		Else:      elseBody,
+	}
 }

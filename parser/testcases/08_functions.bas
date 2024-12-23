@@ -11,3 +11,15 @@ Dim szReturn As String  ' Return default value if not found
     GetVar = RTrim(sSpaces)
     GetVar = Left(GetVar, Len(GetVar) - 1)
 End Function
+
+Function AccountExist(ByVal Name As String) As Boolean
+Dim FileName As String
+
+    FileName = "accounts\" & Trim(Name) & ".ini"
+    
+    If FileExist(FileName) Then
+        AccountExist = True
+    Else
+        AccountExist = False
+    End If
+End Function

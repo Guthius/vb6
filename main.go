@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	bytes, _ := os.ReadFile("parser/testcases/08_functions.bas")
+	bytes, _ := os.ReadFile("parser/testcases/09_if.bas")
 	source := string(bytes)
 
 	tokens := lexer.Tokenize(source)

@@ -60,3 +60,19 @@ type FunctionStmt struct {
 }
 
 func (n FunctionStmt) Stmt() {}
+
+type ElseIfStmt struct {
+	Condition Expr
+	Body      BlockStmt
+}
+
+func (n ElseIfStmt) Stmt() {}
+
+type IfStmt struct {
+	Condition Expr
+	Body      BlockStmt
+	ElseIf    []ElseIfStmt
+	Else      BlockStmt
+}
+
+func (n IfStmt) Stmt() {}

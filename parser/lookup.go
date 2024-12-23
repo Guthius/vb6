@@ -79,6 +79,7 @@ func init() {
 	stmt(lexer.Declare, parseDeclareStmt)
 	stmt(lexer.Function, parseFunctionStmt)
 	stmt(lexer.Dim, parseDimStmt)
+	stmt(lexer.If, parseIfStmt)
 }
 
 func stmt(king lexer.Kind, handler stmtHandler) {

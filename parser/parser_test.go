@@ -18,6 +18,9 @@ func TestParse(t *testing.T) {
 		{"call expr", "testcases/04_call_expr.bas"},
 		{"call", "testcases/05_call.bas"},
 		{"declare", "testcases/06_declare.bas"},
+		{"assignments", "testcases/07_assignments.bas"},
+		{"functions", "testcases/08_functions.bas"},
+		{"if", "testcases/09_if.bas"},
 	}
 
 	for _, c := range cases {
