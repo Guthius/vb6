@@ -26,10 +26,7 @@ func (p *parser) parseStmt() ast.Stmt {
 }
 
 func parseConstDeclStmt(p *parser, public bool) ast.Stmt {
-	if p.next().Kind != lexer.Const {
-		panic("expected const")
-	}
-
+	p.expect(lexer.Const)
 	identifier := p.expect(lexer.Identifier).Value
 	p.expect(lexer.Equal)
 	value := parseExpr(p, assignment)
@@ -154,8 +151,8 @@ func parseCallStmt(p *parser) ast.Stmt {
 	p.expect(lexer.RParen)
 
 	return ast.CallStmt{
-		Func: funcName,
-		Args: args,
+		Identifier: funcName,
+		Args:       args,
 	}
 }
 

@@ -37,8 +37,8 @@ type TypeStmt struct {
 func (n TypeStmt) Stmt() {}
 
 type CallStmt struct {
-	Func string
-	Args []Expr
+	Identifier string
+	Args       []Expr
 }
 
 func (n CallStmt) Stmt() {}
@@ -52,6 +52,3 @@ type DeclareStmt struct {
 }
 
 func (n DeclareStmt) Stmt() {}
-
-
-
