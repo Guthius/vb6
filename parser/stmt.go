@@ -15,8 +15,6 @@ func (p *parser) skipLineBreaks() {
 }
 
 func (p *parser) parseStmt() ast.Stmt {
-	p.skipLineBreaks()
-
 	sfn, ok := tables.stmt[p.peek()]
 	if !ok {
 		expr := parseExpr(p, defaultBindingPower)
@@ -136,5 +134,27 @@ func parseTypeStmt(p *parser) ast.Stmt {
 	return ast.TypeStmt{
 		Identifier: identifier,
 		Fields:     fields,
+	}
+}
+
+func parseCallStmt(p *parser) ast.Stmt {
+	p.expect(lexer.Call)
+	funcName := p.expect(lexer.Identifier).Value
+	p.expect(lexer.LParen)
+
+	args := make([]ast.Expr, 0)
+	for {
+		args = append(args, parseExpr(p, comma))
+		if p.peek() != lexer.Comma {
+			break
+		}
+		p.next()
+	}
+
+	p.expect(lexer.RParen)
+
+	return ast.CallStmt{
+		Func: funcName,
+		Args: args,
 	}
 }

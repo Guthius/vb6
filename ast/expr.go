@@ -45,3 +45,10 @@ type FieldDeclExpr struct {
 }
 
 func (n FieldDeclExpr) Expr() {}
+
+type CallExpr struct {
+	Identifier string
+	Args       []Expr
+}
+
+func (n CallExpr) Expr() {}

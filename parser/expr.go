@@ -47,11 +47,39 @@ func parsePrimaryExpr(p *parser) ast.Expr {
 		return ast.StringExpr{Value: t.Value}
 
 	case lexer.Identifier:
-		t := p.next()
-		return ast.SymbolExpr{Name: t.Value}
+		return parseSymbolExpr(p)
 
 	default:
 		panic(fmt.Errorf("unexpected token %s", lexer.TokenKindString(kind)))
+	}
+}
+
+func parseSymbolExpr(p *parser) ast.Expr {
+	identifier := p.expect(lexer.Identifier).Value
+	if p.peek() == lexer.LParen {
+		return parseCallExpr(p, identifier)
+	}
+
+	return ast.SymbolExpr{Name: identifier}
+}
+
+func parseCallExpr(p *parser, identifier string) ast.Expr {
+	p.expect(lexer.LParen)
+
+	args := []ast.Expr{}
+
+	for p.peek() != lexer.RParen {
+		args = append(args, parseExpr(p, assignment))
+		if p.peek() == lexer.Comma {
+			p.next()
+		}
+	}
+
+	p.expect(lexer.RParen)
+
+	return ast.CallExpr{
+		Identifier: identifier,
+		Args:       args,
 	}
 }
 

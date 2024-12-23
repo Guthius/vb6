@@ -61,6 +61,9 @@ func init() {
 	led(lexer.DivideInt, multiplicative, parseBinaryExpr)
 	led(lexer.Modulus, multiplicative, parseBinaryExpr)
 
+	// Member
+	led(lexer.Dot, member, parseBinaryExpr)
+
 	// Literals and identifiers
 	nud(lexer.Number, primary, parsePrimaryExpr)
 	nud(lexer.String, primary, parsePrimaryExpr)
@@ -71,6 +74,7 @@ func init() {
 	stmt(lexer.Private, parseDeclStmt)
 	stmt(lexer.Const, parsePrivateConstDeclStmt)
 	stmt(lexer.Type, parseTypeStmt)
+	stmt(lexer.Call, parseCallStmt)
 }
 
 func stmt(king lexer.Kind, handler stmtHandler) {

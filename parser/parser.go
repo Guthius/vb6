@@ -24,6 +24,11 @@ func Parse(tokens []lexer.Token) ast.BlockStmt {
 
 	p := newParser(tokens)
 	for !p.isEof() {
+		p.skipLineBreaks()
+		if p.isEof() {
+			break
+		}
+
 		body = append(body, p.parseStmt())
 	}
 

@@ -35,3 +35,10 @@ type TypeStmt struct {
 }
 
 func (n TypeStmt) Stmt() {}
+
+type CallStmt struct {
+	Func string
+	Args []Expr
+}
+
+func (n CallStmt) Stmt() {}
