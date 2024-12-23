@@ -65,3 +65,47 @@ func parseBinaryExpr(p *parser, left ast.Expr, bp bindingPower) ast.Expr {
 		Right:    right,
 	}
 }
+
+var dataTypeMap = map[lexer.Kind]ast.DataType{
+	lexer.BooleanType: ast.DtBoolean,
+	lexer.ByteType:    ast.DtByte,
+	lexer.IntegerType: ast.DtInteger,
+	lexer.LongType:    ast.DtLong,
+	lexer.SingleType:  ast.DtSingle,
+	lexer.DoubleType:  ast.DtDouble,
+	lexer.StringType:  ast.DtString,
+}
+
+func parseTypeExpr(p *parser) ast.TypeExpr {
+	t := p.next()
+	if !t.IsDataType() {
+		panic("expected data type")
+	}
+
+	dataType, ok := dataTypeMap[t.Kind]
+	if !ok {
+		panic(fmt.Errorf("unexpected token %s", lexer.TokenKindString(t.Kind)))
+	}
+
+	if dataType == ast.DtString {
+		if p.peek() == lexer.Multiply {
+			p.next()
+			token := p.expect(lexer.Number)
+			len, err := strconv.Atoi(token.Value)
+			if err != nil {
+				panic(fmt.Errorf("invalid number %s", token.Value))
+			}
+			return ast.TypeExpr{
+				Type:       dataType,
+				IsFixedLen: true,
+				Len:        len,
+			}
+		}
+	}
+
+	return ast.TypeExpr{
+		Type:       dataType,
+		IsFixedLen: false,
+		Len:        0,
+	}
+}

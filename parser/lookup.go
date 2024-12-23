@@ -65,11 +65,15 @@ func init() {
 	nud(lexer.Number, primary, parsePrimaryExpr)
 	nud(lexer.String, primary, parsePrimaryExpr)
 	nud(lexer.Identifier, primary, parsePrimaryExpr)
+
+	// Statements
+	stmt(lexer.Public, parseDeclStmt)
+	stmt(lexer.Private, parseDeclStmt)
+	stmt(lexer.Const, parsePrivateConstDeclStmt)
 }
 
-func stmt(king lexer.Kind, bp bindingPower, handler stmtHandler) {
+func stmt(king lexer.Kind, handler stmtHandler) {
 	tables.stmt[king] = handler
-	tables.bp[king] = bp
 }
 
 func nud(king lexer.Kind, bp bindingPower, handler nudHandler) {

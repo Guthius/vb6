@@ -1,7 +1,7 @@
 package ast
 
-import(
-	 "github.com/guthius/vb6/lexer"
+import (
+	"github.com/guthius/vb6/lexer"
 )
 
 type NumberExpr struct {
@@ -21,8 +21,6 @@ type SymbolExpr struct {
 }
 
 func (n SymbolExpr) Expr() {}
-
-//
 
 type BinaryExpr struct {
 	Left     Expr
