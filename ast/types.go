@@ -10,12 +10,14 @@ const (
 	DtSingle
 	DtDouble
 	DtString
+	DtUserDefined
 )
 
 type TypeExpr struct {
 	Type       DataType
+	TypeName   string // only for DtUserDefined
 	IsFixedLen bool
-	Len        int
+	Len        Expr
 }
 
 func (n TypeExpr) Expr() {}

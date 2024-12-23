@@ -12,7 +12,6 @@ type ExprStmt struct {
 
 func (n ExprStmt) Stmt() {}
 
-// Public Const START_X = MAX_MAPX / 2
 type ConstDeclStmt struct {
 	Public     bool
 	Identifier string
@@ -21,13 +20,18 @@ type ConstDeclStmt struct {
 
 func (n ConstDeclStmt) Stmt() {}
 
-// Dim IPMask As String
-// Public SpawnSeconds As Long
 type VarDeclStmt struct {
+	Public     bool
 	Identifier string
 	Type       TypeExpr
 	Value      Expr
-	Public     bool
 }
 
 func (n VarDeclStmt) Stmt() {}
+
+type TypeStmt struct {
+	Identifier string
+	Fields     []FieldDeclExpr
+}
+
+func (n TypeStmt) Stmt() {}

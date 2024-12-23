@@ -5,18 +5,19 @@ import (
 	"github.com/guthius/vb6/lexer"
 )
 
-func (p *parser) parseStmt() ast.Stmt {
-	var kind lexer.Kind
-
+func (p *parser) skipLineBreaks() {
 	for !p.isEof() {
-		kind = p.peek()
-		if kind != lexer.LineBreak {
+		if p.peek() != lexer.LineBreak {
 			break
 		}
 		p.next()
 	}
+}
 
-	sfn, ok := tables.stmt[kind]
+func (p *parser) parseStmt() ast.Stmt {
+	p.skipLineBreaks()
+
+	sfn, ok := tables.stmt[p.peek()]
 	if !ok {
 		expr := parseExpr(p, defaultBindingPower)
 		p.expectOrEof(lexer.LineBreak)
@@ -67,9 +68,73 @@ func parseDeclStmt(p *parser) ast.Stmt {
 	p.expectOrEof(lexer.LineBreak)
 
 	return ast.VarDeclStmt{
+		Public:     public,
 		Identifier: identifier,
 		Type:       dataType,
 		Value:      value,
-		Public:     public,
+	}
+}
+
+func parseRangeExpr(p *parser) []ast.RangeExpr {
+	ranges := make([]ast.RangeExpr, 0)
+
+	p.expect(lexer.LParen)
+	for {
+		l := parseExpr(p, assignment)
+		p.expect(lexer.To)
+		u := parseExpr(p, assignment)
+		ranges = append(ranges, ast.RangeExpr{LBound: l, UBound: u})
+		if p.peek() != lexer.Comma {
+			break
+		}
+		p.next()
+	}
+
+	p.expect(lexer.RParen)
+
+	return ranges
+}
+
+func parseFieldDeclExpr(p *parser) ast.FieldDeclExpr {
+	var ranges []ast.RangeExpr
+
+	identifier := p.expect(lexer.Identifier).Value
+	if p.peek() == lexer.LParen {
+		ranges = parseRangeExpr(p)
+	}
+
+	p.expect(lexer.As)
+	dataType := parseTypeExpr(p)
+	p.expect(lexer.LineBreak)
+
+	return ast.FieldDeclExpr{
+		Identifier: identifier,
+		Type:       dataType,
+		IsArray:    ranges != nil,
+		Ranges:     ranges,
+	}
+}
+
+func parseTypeStmt(p *parser) ast.Stmt {
+	p.expect(lexer.Type)
+	identifier := p.expect(lexer.Identifier).Value
+	p.next()
+
+	fields := make([]ast.FieldDeclExpr, 0)
+	for {
+		p.skipLineBreaks()
+
+		if p.peek() == lexer.EndType {
+			break
+		}
+
+		fields = append(fields, parseFieldDeclExpr(p))
+	}
+
+	p.expect(lexer.EndType)
+
+	return ast.TypeStmt{
+		Identifier: identifier,
+		Fields:     fields,
 	}
 }

@@ -29,3 +29,19 @@ type BinaryExpr struct {
 }
 
 func (n BinaryExpr) Expr() {}
+
+type RangeExpr struct {
+	LBound Expr
+	UBound Expr
+}
+
+func (n RangeExpr) Expr() {}
+
+type FieldDeclExpr struct {
+	Identifier string
+	Type       TypeExpr
+	IsArray    bool
+	Ranges     []RangeExpr
+}
+
+func (n FieldDeclExpr) Expr() {}

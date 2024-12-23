@@ -77,24 +77,28 @@ var dataTypeMap = map[lexer.Kind]ast.DataType{
 }
 
 func parseTypeExpr(p *parser) ast.TypeExpr {
-	t := p.next()
-	if !t.IsDataType() {
+	cur := p.next()
+	if !cur.IsDataType() {
+		if cur.Kind == lexer.Identifier {
+			return ast.TypeExpr{
+				Type:       ast.DtUserDefined,
+				TypeName:   cur.Value,
+				IsFixedLen: false,
+				Len:        nil,
+			}
+		}
 		panic("expected data type")
 	}
 
-	dataType, ok := dataTypeMap[t.Kind]
+	dataType, ok := dataTypeMap[cur.Kind]
 	if !ok {
-		panic(fmt.Errorf("unexpected token %s", lexer.TokenKindString(t.Kind)))
+		panic(fmt.Errorf("unexpected token %s", lexer.TokenKindString(cur.Kind)))
 	}
 
 	if dataType == ast.DtString {
 		if p.peek() == lexer.Multiply {
 			p.next()
-			token := p.expect(lexer.Number)
-			len, err := strconv.Atoi(token.Value)
-			if err != nil {
-				panic(fmt.Errorf("invalid number %s", token.Value))
-			}
+			len := parseExpr(p, assignment)
 			return ast.TypeExpr{
 				Type:       dataType,
 				IsFixedLen: true,
@@ -106,6 +110,6 @@ func parseTypeExpr(p *parser) ast.TypeExpr {
 	return ast.TypeExpr{
 		Type:       dataType,
 		IsFixedLen: false,
-		Len:        0,
+		Len:        nil,
 	}
 }

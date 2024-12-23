@@ -70,6 +70,7 @@ func init() {
 	stmt(lexer.Public, parseDeclStmt)
 	stmt(lexer.Private, parseDeclStmt)
 	stmt(lexer.Const, parsePrivateConstDeclStmt)
+	stmt(lexer.Type, parseTypeStmt)
 }
 
 func stmt(king lexer.Kind, handler stmtHandler) {
