@@ -213,3 +213,85 @@ func parseDeclareStmt(p *parser) ast.Stmt {
 		ReturnType: returnType,
 	}
 }
+
+func parseArgList(p *parser) []ast.ArgExpr {
+	args := make([]ast.ArgExpr, 0)
+	for p.peek() != lexer.RParen {
+		byRef := false
+		switch p.peek() {
+		case lexer.ByVal:
+			p.next()
+		case lexer.ByRef:
+			byRef = true
+			p.next()
+		}
+
+		name := p.expect(lexer.Identifier).Value
+		p.expect(lexer.As)
+		argType := parseTypeExpr(p)
+
+		args = append(args, ast.ArgExpr{
+			ByRef:      byRef,
+			Identifier: name,
+			Type:       argType,
+		})
+
+		if p.peek() != lexer.Comma {
+			break
+		}
+
+		p.next()
+	}
+
+	return args
+}
+
+func parseFunctionStmt(p *parser) ast.Stmt {
+	p.expect(lexer.Function)
+	identifier := p.expect(lexer.Identifier).Value
+	p.expect(lexer.LParen)
+	args := parseArgList(p)
+	p.expect(lexer.RParen)
+	p.expect(lexer.As)
+	returnType := parseTypeExpr(p)
+	p.expectOrEof(lexer.LineBreak)
+	body := parseBlockStmt(p, lexer.EndFunction)
+	p.expect(lexer.EndFunction)
+
+	return ast.FunctionStmt{
+		Public:     true,
+		Identifier: identifier,
+		Args:       args,
+		ReturnType: returnType,
+		Body:       body,
+	}
+}
+
+func parseDimStmt(p *parser) ast.Stmt {
+	p.expect(lexer.Dim)
+	identifier := p.expect(lexer.Identifier).Value
+	p.expect(lexer.As)
+	dataType := parseTypeExpr(p)
+	p.expectOrEof(lexer.LineBreak)
+
+	return ast.VarDeclStmt{
+		Public:     false,
+		Identifier: identifier,
+		Type:       dataType,
+	}
+}
+
+func parseBlockStmt(p *parser, end lexer.Kind) ast.BlockStmt {
+	body := make(ast.BlockStmt, 0)
+
+	for !p.isEof() {
+		p.skipLineBreaks()
+		if p.isEof() || p.peek() == end {
+			break
+		}
+
+		body = append(body, p.parseStmt())
+	}
+
+	return body
+}

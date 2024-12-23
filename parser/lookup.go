@@ -54,6 +54,7 @@ func init() {
 	// Additive operators
 	led(lexer.Add, additive, parseBinaryExpr)
 	led(lexer.Subtract, additive, parseBinaryExpr)
+	led(lexer.Concat, additive, parseBinaryExpr)
 
 	// Multiplicative operators
 	led(lexer.Multiply, multiplicative, parseBinaryExpr)
@@ -76,6 +77,8 @@ func init() {
 	stmt(lexer.Type, parseTypeStmt)
 	stmt(lexer.Call, parseCallStmt)
 	stmt(lexer.Declare, parseDeclareStmt)
+	stmt(lexer.Function, parseFunctionStmt)
+	stmt(lexer.Dim, parseDimStmt)
 }
 
 func stmt(king lexer.Kind, handler stmtHandler) {

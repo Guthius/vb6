@@ -1,8 +1,6 @@
 package ast
 
-type BlockStmt struct {
-	Body []Stmt
-}
+type BlockStmt []Stmt
 
 func (n BlockStmt) Stmt() {}
 
@@ -52,3 +50,13 @@ type DeclareStmt struct {
 }
 
 func (n DeclareStmt) Stmt() {}
+
+type FunctionStmt struct {
+	Public     bool
+	Identifier string
+	Args       []ArgExpr
+	ReturnType TypeExpr
+	Body       BlockStmt
+}
+
+func (n FunctionStmt) Stmt() {}

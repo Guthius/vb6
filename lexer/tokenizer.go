@@ -55,6 +55,7 @@ type tokenSpec struct {
 // token before matching it with the '>' token.
 var tokenSpecs = []tokenSpec{
 	{String: "Option Explicit", Kind: OptionExplicit},
+	{String: "End Function", Kind: EndFunction},
 	{String: "End Select", Kind: EndSelect},
 	{String: "DoEvents", Kind: DoEvents},
 	{String: "End Enum", Kind: EndEnum},

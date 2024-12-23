@@ -52,6 +52,7 @@ const (
 	Declare
 	Sub
 	Function
+	EndFunction
 	ByVal
 	ByRef
 	Call
@@ -183,6 +184,8 @@ func TokenKindString(kind Kind) string {
 		return "Sub"
 	case Function:
 		return "Function"
+	case EndFunction:
+		return "EndFunction"
 	case ByVal:
 		return "ByVal"
 	case ByRef:

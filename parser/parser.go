@@ -20,7 +20,7 @@ func newParser(tokens []lexer.Token) *parser {
 }
 
 func Parse(tokens []lexer.Token) ast.BlockStmt {
-	body := make([]ast.Stmt, 0)
+	body := make(ast.BlockStmt, 0)
 
 	p := newParser(tokens)
 	for !p.isEof() {
@@ -32,9 +32,7 @@ func Parse(tokens []lexer.Token) ast.BlockStmt {
 		body = append(body, p.parseStmt())
 	}
 
-	return ast.BlockStmt{
-		Body: body,
-	}
+	return body
 }
 
 func (p *parser) peek() lexer.Kind {
