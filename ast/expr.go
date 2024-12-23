@@ -52,3 +52,11 @@ type CallExpr struct {
 }
 
 func (n CallExpr) Expr() {}
+
+type ArgExpr struct {
+	ByRef      bool
+	Identifier string
+	Type       TypeExpr
+}
+
+func (n ArgExpr) Expr() {}

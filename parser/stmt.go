@@ -158,3 +158,61 @@ func parseCallStmt(p *parser) ast.Stmt {
 		Args: args,
 	}
 }
+
+func parseDeclareStmt(p *parser) ast.Stmt {
+	p.expect(lexer.Declare)
+	p.expect(lexer.Function)
+	identifier := p.expect(lexer.Identifier).Value
+	p.expect(lexer.Lib)
+	lib := p.expect(lexer.String).Value
+	p.expect(lexer.Alias)
+	alias := p.expect(lexer.String).Value
+
+	p.expect(lexer.LParen)
+
+	args := make([]ast.ArgExpr, 0)
+	for p.peek() != lexer.RParen {
+		byRef := false
+		switch p.peek() {
+		case lexer.ByVal:
+			p.next()
+		case lexer.ByRef:
+			byRef = true
+			p.next()
+		}
+
+		name := p.expect(lexer.Identifier).Value
+		p.expect(lexer.As)
+		argType := parseTypeExpr(p)
+
+		args = append(args, ast.ArgExpr{
+			ByRef:      byRef,
+			Identifier: name,
+			Type:       argType,
+		})
+
+		if p.peek() != lexer.Comma {
+			break
+		}
+
+		p.next()
+	}
+
+	p.expect(lexer.RParen)
+
+	var returnType ast.TypeExpr
+	if p.peek() == lexer.As {
+		p.next()
+		returnType = parseTypeExpr(p)
+	}
+
+	p.expectOrEof(lexer.LineBreak)
+
+	return ast.DeclareStmt{
+		Identifier: identifier,
+		Lib:        lib,
+		Alias:      alias,
+		Args:       args,
+		ReturnType: returnType,
+	}
+}

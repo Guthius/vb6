@@ -42,3 +42,16 @@ type CallStmt struct {
 }
 
 func (n CallStmt) Stmt() {}
+
+type DeclareStmt struct {
+	Identifier string
+	Lib        string
+	Alias      string
+	Args       []ArgExpr
+	ReturnType TypeExpr
+}
+
+func (n DeclareStmt) Stmt() {}
+
+
+
